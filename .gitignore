@@ -1,0 +1,19 @@
+node_modules/
+dist/
+dist-shrunk/
+dist-shrunk-ctrl/
+*.log
+.DS_Store
+coverage/
+
+# Sample app data + dependencies
+examples/*/node_modules/
+examples/*/prisma/dev.db
+examples/*/prisma/dev.db-journal
+examples/*/prisma/dev.db-wal
+examples/*/prisma/dev.db-shm
+
+# OS / editor
+.idea/
+.vscode/
+

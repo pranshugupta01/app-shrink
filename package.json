@@ -1,0 +1,58 @@
+{
+  "name": "app-shrink",
+  "version": "0.1.0",
+  "description": "Clean-room micro-app compiler: transpile bloated full-stack Node apps into a single-file Hono + SQLite micro-service.",
+  "license": "MIT",
+  "type": "commonjs",
+  "bin": {
+    "app-shrink": "./dist/bin/cli.js",
+    "app-shrink-mcp": "./dist/bin/mcp.js"
+  },
+  "main": "./dist/src/index.js",
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "skills",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "tsc -p tsconfig.json",
+    "dev": "tsx bin/cli.ts",
+    "mcp": "tsx bin/mcp.ts",
+    "shrink": "tsx bin/cli.ts build",
+    "inspect": "tsx bin/cli.ts inspect",
+    "shrink:sample": "tsx bin/cli.ts build ./examples/sample-todo-app --verify",
+    "inspect:sample": "tsx bin/cli.ts inspect ./examples/sample-todo-app",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "setup:sample": "npm --prefix examples/sample-todo-app install && npm --prefix examples/sample-todo-app run db:push && npm --prefix examples/sample-todo-app run db:seed"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.26.3",
+    "@babel/parser": "^7.26.3",
+    "@babel/traverse": "^7.26.4",
+    "@babel/types": "^7.26.3",
+    "@hono/node-server": "^1.13.7",
+    "better-sqlite3": "^11.7.0",
+    "cli-progress": "^3.12.0",
+    "commander": "^12.1.0",
+    "hono": "^4.6.14",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.6.8",
+    "@types/babel__traverse": "^7.20.6",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/cli-progress": "^3.11.6",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
