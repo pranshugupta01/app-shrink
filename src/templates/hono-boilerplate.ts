@@ -388,7 +388,9 @@ function createModelClient(modelName) {
       return one(sql, params, options.select);
     },
 
-    findUnique(args) {
+    // FIX: Prisma returns null for a missing row; better-sqlite3 throws.
+  // Coerce the throw to null so handlers can keep their `if (!row)` checks.
+  findUniqueSafe(args) {
       const options = args || {};
       const params = [];
       const sql = 'SELECT * FROM ' + table + ' WHERE ' + buildWhere(modelName, options.where, params) + ' LIMIT 1';
