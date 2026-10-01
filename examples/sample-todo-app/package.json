@@ -1,0 +1,24 @@
+{
+  "name": "sample-todo-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deliberately bloated Express + Prisma todo app used as the shrink target.",
+  "main": "server.ts",
+  "scripts": {
+    "start": "tsx server.ts",
+    "db:push": "prisma db push --skip-generate --accept-data-loss",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2"
+  }
+}
