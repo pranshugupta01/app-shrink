@@ -389,6 +389,9 @@ function createModelClient(modelName) {
     },
 
     // FIX: Prisma returns null for a missing row; better-sqlite3 throws.
+  // FIX #2: Prisma ignores autoincrement ids in data; better-sqlite3 would too if
+  // the column were INTEGER PRIMARY KEY, but only when the value is undefined. Strip
+  // undefined id values from the data object before INSERT.
   // Coerce the throw to null so handlers can keep their `if (!row)` checks.
   findUniqueSafe(args) {
       const options = args || {};
