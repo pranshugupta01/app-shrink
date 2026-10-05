@@ -7,6 +7,11 @@ import { createRequire } from 'node:module';
 import { promisify } from 'node:util';
 import { AnalysisResult, RouteDef } from './analyzer';
 
+/** The full set of files we have to copy to faithfully snapshot a SQLite db.
+ *  better-sqlite3 leaves -wal / -shm sidecars next to the main file when WAL
+ *  mode is on; without them the snapshot is not crash-consistent. */
+const SQLITE_SIDECARS = ['', '-wal', '-shm', '-journal'] as const;
+
 const execFileAsync = promisify(execFile);
 
 export interface ProbeSpec {
