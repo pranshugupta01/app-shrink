@@ -537,3 +537,18 @@ export async function analyze(targetDir: string): Promise<AnalysisResult> {
     scannedFiles: allFiles.length,
   };
 }
+
+
+export function resolveMount(call: any, file: string): string | null {
+  // app.use("/prefix", router) -> the prefix that needs to be prepended to
+  // every route the sub-router declares.  Returns null when the call is not
+  // a router mount.
+  if (call?.type !== "CallExpression") return null;
+  const args = call.arguments ?? [];
+  if (args.length !== 2) return null;
+  const first = args[0];
+  if (first?.type !== "StringLiteral" && first?.type !== "Literal") return null;
+  const prefix = String(first.value);
+  if (!prefix.startsWith("/")) return null;
+  return prefix.replace(/\/$/, "");
+}
