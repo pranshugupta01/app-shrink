@@ -27,6 +27,12 @@ export interface FieldDef {
   prismaDefault?: { fn: string; args: string };
 }
 
+/** A Prisma @@index or @@unique declaration, captured at the model level. */
+interface ModelIndex {
+  columns: string[];
+  unique: boolean;
+}
+
 export interface ModelDef {
   name: string;
   tableName: string;
