@@ -552,3 +552,14 @@ export function resolveMount(call: any, file: string): string | null {
   if (!prefix.startsWith("/")) return null;
   return prefix.replace(/\/$/, "");
 }
+
+
+export function isNextAppRouteFile(file: string): boolean {
+  // app/**/route.ts is the App Router handler convention.
+  return /\/app\/.+\/route\.(t|j)sx?$/.test(file);
+}
+
+export function isNextPagesApiFile(file: string): boolean {
+  // pages/api/**/*.{ts,js} is the Pages Router handler convention.
+  return /\/pages\/api\/.+\.(t|j)s$/.test(file);
+}
