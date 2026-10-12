@@ -27,6 +27,10 @@ export type Framework = 'express' | 'next-app' | 'next-pages';
  * e.g. `router.get('/', listTodos)` or `router.get('/', controller.list)`.
  * `importSpecifier` is the raw string from the import statement, when the
  * binding could be traced back to one.
+ *
+ * The analyzer now also recognises OptionalMemberExpression and stores the
+ * optional-chain path so the transpiler can resolve through
+ * `router.get('/', controller?.list)`.
  */
 export interface HandlerRef {
   /** Local binding as written at the call site. */
