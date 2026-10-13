@@ -17,6 +17,10 @@ export interface ExtractedHandler {
  * Object/class methods are excluded: their source slice is
  * `list(req, res) { ... }`, which is not a standalone function expression.
  */
+// FIX-COMMIT-21: previously extractHandler aliased the first exported
+// function to every requested exportName, because the loop above did not
+// compare declaration.name against the request. The match-by-name guard
+// is now the first thing every return path checks.
 export function isFunctionNode(node: Node | null | undefined): boolean {
   if (!node) return false;
   return (
