@@ -528,6 +528,13 @@ export function jobOutputName(id: string): string {
   return `${id}.out.ts`;
 }
 
+// COMMIT-24-EMIT-JOBS: --emit-jobs writes one JSON per imported handler
+// into the user-supplied directory. The host agent (or another LLM, or
+// a developer) reads the JSON, writes a sibling NNN.out.ts containing
+// the replacement handler, and the next build with --use-jobs picks
+// it up. The job id is METHOD-path slug so the same id survives a
+// rebuild and partial answers are accepted.
+
 export async function writeHandlerJobs(dir: string, jobs: HandlerJob[]): Promise<WrittenJob[]> {
   await fs.mkdir(dir, { recursive: true });
   const written: WrittenJob[] = [];
