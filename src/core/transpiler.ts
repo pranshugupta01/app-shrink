@@ -549,6 +549,14 @@ function renderRouteBlock(routes: TranspiledHandler[]): string {
   return lines.join('\n');
 }
 
+// COMMIT-25-PROVIDER-DROP: a provider that *detected* but is
+// *unreachable* (not logged in, HTTP error, missing model) used to
+// retry on every imported route, so a build with 10 jobs and a
+// broken provider would sit on ten 120s timeouts. We now pass
+// `activeRoute` into the loop and reset it to null on the first
+// transport failure, so the remaining routes fall back to AST
+// transpilation immediately.
+
 export async function transpile(options: TranspileOptions): Promise<TranspileResult> {
   const { analysis, outDir, port, version } = options;
   await fs.mkdir(outDir, { recursive: true });
