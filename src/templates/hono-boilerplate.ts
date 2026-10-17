@@ -388,12 +388,9 @@ function createModelClient(modelName) {
       return one(sql, params, options.select);
     },
 
-    // FIX: Prisma returns null for a missing row; better-sqlite3 throws.
-  // FIX #2: Prisma ignores autoincrement ids in data; better-sqlite3 would too if
-  // the column were INTEGER PRIMARY KEY, but only when the value is undefined. Strip
-  // undefined id values from the data object before INSERT.
-  // Coerce the throw to null so handlers can keep their `if (!row)` checks.
-  findUniqueSafe(args) {
+    // Prisma's findUnique returns null for a missing row; one() above
+    // does the same by mapping undefined from .get() to null.
+    findUnique(args) {
       const options = args || {};
       const params = [];
       const sql = 'SELECT * FROM ' + table + ' WHERE ' + buildWhere(modelName, options.where, params) + ' LIMIT 1';
@@ -536,7 +533,7 @@ app.use('*', async (c, next) => {
   c.header('X-Powered-By', 'app-shrink');
 });
 
-app.get('/healthz', (c) => c.json({ status: 'ok', service: '__APP_SHRINK_APP_NAME__' }));
+// __APP_SHRINK_HEALTHZ__
 
 // ===========================================================================
 // 7. Transpiled routes
@@ -589,6 +586,13 @@ export interface RenderBoilerplateOptions {
   schemaSql: string;
   defaultPort: number;
   dbFile: string;
+  /**
+   * When true, the boilerplate registers a `/healthz` endpoint that returns
+   * `{ status: 'ok', service: <appName> }`. When false, the source app
+   * already declared `/healthz` and the analyzer will have transpiled it as
+   * one of the routes; double-registration would break the verifier.
+   */
+  injectHealthz: boolean;
 }
 
 /** Fills in every placeholder that is not route- or static-specific. */
@@ -599,7 +603,13 @@ export function renderBoilerplate(options: RenderBoilerplateOptions): string {
     .replace('__APP_SHRINK_MODELS__', () => options.modelsJson)
     .replace('__APP_SHRINK_SCHEMA_SQL__', () => JSON.stringify(options.schemaSql))
     .replace('__APP_SHRINK_PORT__', () => String(options.defaultPort))
-    .replace(/__APP_SHRINK_DB_FILE__/g, () => options.dbFile);
+    .replace(/__APP_SHRINK_DB_FILE__/g, () => options.dbFile)
+    .replace(
+      '// __APP_SHRINK_HEALTHZ__',
+      () => options.injectHealthz
+        ? `app.get('/healthz', (c) => c.json({ status: 'ok', service: '${options.appName}' }));`
+        : '',
+    );
 }
 
 /** Renders the `serveStatic` block for each packed frontend directory. */
