@@ -302,6 +302,31 @@ It is published in the npm tarball too, so after `npm i -g` it lives at
 it tells the agent to inspect first, build with `--verify`, and never hand-edit
 generated output.
 
+## Skill: shrink-skill
+
+[`.claude/skills/shrink-skill/SKILL.md`](.claude/skills/shrink-skill/SKILL.md)
+is an orchestrator that drives this CLI in a tight loop: inspect →
+emit jobs → fill `.out.ts` → rebuild with `--use-jobs --verify` →
+iterate on parity. It is the agent's view of app-shrink; the CLI
+underneath is unchanged.
+
+If your agent reads Claude-style skill folders (Trae, Claude Code,
+Codex), symlink or copy the directory into wherever it looks:
+
+```bash
+ln -s "$PWD/.claude/skills/shrink-skill" ~/.claude/skills/shrink-skill   # Claude Code, global
+ln -s "$PWD/.claude/skills/shrink-skill" ~/.trae/skills/shrink-skill     # Trae, global
+```
+
+The portable, npm-shipped equivalent lives at
+[`skills/app-shrink/SKILL.md`](skills/app-shrink/SKILL.md) and
+describes the same workflow from the CLI's side.
+
+The skill never deletes the AST pipeline. The resolver, the
+extractor, the schema converter, and the 56-test suite are the
+deterministic ground truth the skill is built on. The agent's
+only job is to fill the job files correctly.
+
 ## Headline results
 
 Measured on the bundled sample app:
