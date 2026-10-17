@@ -90,6 +90,23 @@ describe('extractHandler', () => {
     const source = 'export const list = [1, 2, 3];';
     expect(extractHandler(source, 'list')).toBeNull();
   });
+
+  it('resolves a property on a separately exported object literal', () => {
+    const source = [
+      'export const todoController = {',
+      '  countTodos: async (_req, res) => {',
+      '    const count = await prisma.todo.count();',
+      '    res.json({ count });',
+      '  },',
+      '};',
+    ].join('\n');
+
+    const handler = extractHandler(source, 'todoController', 'countTodos');
+    expect(handler).not.toBeNull();
+    expect(handler!.property).toBe('countTodos');
+    expect(handler!.code).toContain('prisma.todo.count');
+    expect(handler!.code).toContain('res.json({ count })');
+  });
 });
 
 describe('isFunctionNode', () => {

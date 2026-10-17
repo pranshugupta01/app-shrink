@@ -382,6 +382,24 @@ function transpileRoute(route: RouteDef): TranspiledHandler {
   return { method: route.method, path: route.path, code };
 }
 
+/**
+ * Compares two routes for registration order. Literal paths sort before
+ * parameterised ones of the same depth so Hono matches `/api/todos/count`
+ * before `/api/todos/:id` would swallow it.
+ */
+function routeOrderComparator(a: RouteDef, b: RouteDef): number {
+  if (a.method !== b.method) return a.method.localeCompare(b.method);
+  const aSegs = a.path.split('/').filter(Boolean);
+  const bSegs = b.path.split('/').filter(Boolean);
+  const len = Math.min(aSegs.length, bSegs.length);
+  for (let i = 0; i < len; i += 1) {
+    const aParam = aSegs[i].startsWith(':');
+    const bParam = bSegs[i].startsWith(':');
+    if (aParam !== bParam) return aParam ? 1 : -1;
+  }
+  return a.path.localeCompare(b.path);
+}
+
 /** Stable, human-readable job id so `--use-jobs` matches `--emit-jobs` runs. */
 export function jobIdFor(route: RouteDef): string {
   const slug = `${route.method}-${route.path}`
@@ -570,7 +588,11 @@ export async function transpile(options: TranspileOptions): Promise<TranspileRes
   // login costs one failed call rather than one per imported handler.
   let activeRoute = imported?.llmRoute ?? null;
 
-  for (const route of analysis.routes) {
+  // Literal paths must register before parameterised paths of the same depth,
+  // otherwise Hono matches `/api/todos/count` against `/api/todos/:id` first.
+  const orderedRoutes = [...analysis.routes].sort(routeOrderComparator);
+
+  for (const route of orderedRoutes) {
     const handler = route.handler;
     const isInline =
       !!handler &&
@@ -617,6 +639,7 @@ export async function transpile(options: TranspileOptions): Promise<TranspileRes
     schemaSql,
     defaultPort: port,
     dbFile: DEFAULT_DB_FILE,
+    injectHealthz: !analysis.routes.some((route) => route.path === '/healthz'),
   });
 
   server = server.replace(

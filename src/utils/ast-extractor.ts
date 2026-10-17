@@ -187,6 +187,23 @@ export function extractHandler(
     candidates.push(match ? propertyValue(match) : null);
   }
 
+  // Property access on a separately-exported namespace: `const c = { list };`
+  // where the route uses `c.list`. localName = `c`, property = `list`.
+  if (property) {
+    const container = locals.get(exportName) ?? exportAssignments.get(exportName) ?? null;
+    if (container) {
+      const resolvedContainer = container.type === 'Identifier'
+        ? (locals.get(container.name) ?? exportAssignments.get(container.name) ?? null)
+        : container;
+      if (resolvedContainer?.type === 'ObjectExpression') {
+        const match = ((resolvedContainer as any).properties as Node[] | undefined)?.find(
+          (prop) => propertyKey(prop) === property,
+        );
+        if (match) candidates.unshift(propertyValue(match));
+      }
+    }
+  }
+
   for (const candidate of candidates) {
     if (!candidate) continue;
 
