@@ -17,3 +17,4 @@ examples/*/prisma/dev.db-shm
 .idea/
 .vscode/
 
+.staging/
